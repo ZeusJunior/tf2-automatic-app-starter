@@ -7,12 +7,12 @@
 - start everything
 
 # Adding more bots
-Simply copy paste the `bot1` template at the very bottom of the `docker-compose.yml` file [here](https://github.com/zeusjunior/tf2-automatic-app-starter/blob/master/docker-compose.yml#L108)  
+Simply copy paste the `bot1` template at the very bottom of the `docker-compose.yml` file [here](https://github.com/zeusjunior/tf2-automatic-app-starter/blob/master/docker-compose.yml#L114)  
 Rename the service name and add a new corresponding env file
 
 # Developing your app
 Uncomment these lines
-https://github.com/zeusjunior/tf2-automatic-app-starter/blob/master/docker-compose.yml#L103-L105  
+https://github.com/zeusjunior/tf2-automatic-app-starter/blob/master/docker-compose.yml#L109-L111  
 Then restart the app container
 
 # Production
