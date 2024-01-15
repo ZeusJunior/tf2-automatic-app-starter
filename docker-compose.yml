@@ -1,0 +1,113 @@
+version: '3.8'
+
+x-base-bot: &base-bot
+  image: ghcr.io/tf2-automatic/bot:latest
+  restart: unless-stopped
+  depends_on:
+    - rabbitmq
+    - bot-manager
+    - minio
+  expose:
+    - '3000'
+  volumes:
+    - 'bot:/data'
+  environment: &rmq-redis-env	
+    REDIS_HOST: 'redis'
+    REDIS_PORT: 6379
+    REDIS_PASSWORD: ${REDIS_PASSWORD}
+    RABBITMQ_HOST: 'rabbitmq'
+    RABBITMQ_PORT: 5672
+    RABBITMQ_USERNAME: ${RABBITMQ_DEFAULT_USER}
+    RABBITMQ_PASSWORD: ${RABBITMQ_DEFAULT_PASS}
+    RABBITMQ_VHOST: ''
+
+volumes:
+  bot:
+  rabbitmq:
+  redis:
+  minio:
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.9.28-management-alpine
+    expose:
+      - '5672'
+    ports:
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - 'rabbitmq:/var/lib/rabbitmq'
+
+  minio:
+    image: minio/minio:RELEASE.2023-02-17T17-52-43Z
+    command: server /data --console-address ":9001"
+    expose:
+      - '9000'
+    ports:
+      - '9001:9001'
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - 'minio:/data'
+
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes --maxmemory-policy noeviction
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis:/data
+
+  bot-manager:
+    image: ghcr.io/tf2-automatic/bot-manager:latest
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+      - redis
+    expose:
+      - '3000'
+    ports:
+      - '3000:3000'
+    environment:
+      <<: *rmq-redis-env
+
+  message-relay:
+    image: ghcr.io/tf2-automatic/message-relay:latest
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+      - redis
+      - bot-manager
+      - bot1
+    environment:
+      <<: *rmq-redis-env
+
+  app:
+    image: ghcr.io/zeusjunior/tf2-automatic-app-starter:latest
+    restart: unless-stopped
+    depends_on:
+      - rabbitmq
+      - bot-manager
+    environment:
+      <<: *rmq-redis-env
+    # Uncomment the following lines if you want to develop the app locally
+    # This will mount the app folder to the container, allowing you to make changes to the app without having to rebuild the image
+    # command: yarn --cwd /app start:dev
+    # volumes:
+    #   - './app:/app'
+
+  # Copy this block for each bot you want to run, but make sure to change the first port, name of the service and the env_file
+  bot1:
+    <<: *base-bot
+    ports:
+      - '3001:3000'
+    env_file: 
+      - './bots/bot1.env'

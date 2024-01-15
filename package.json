@@ -1,0 +1,19 @@
+{
+  "name": "tf2-automatic-app-starter",
+  "version": "1.0.0",
+  "description": "Starter project for running tf2-automatic using your own custom app, with all docker shenanigans already handled",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZeusJunior/tf2-automatic-app-starter.git"
+  },
+  "author": "ZeusJunior",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ZeusJunior/tf2-automatic-app-starter/issues"
+  },
+  "homepage": "https://github.com/ZeusJunior/tf2-automatic-app-starter#readme"
+}

@@ -1,0 +1,4 @@
+.env
+bots/*.env
+!bots/template.env
+```
