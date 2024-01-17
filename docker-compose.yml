@@ -91,7 +91,7 @@ services:
       <<: *rmq-redis-env
 
   app:
-    image: ghcr.io/zeusjunior/tf2-automatic-app-starter:latest
+    image: ghcr.io/zeusjunior/tf2-automatic-app-starter:master
     # Uncomment the following lines if you want to build the image from source instead of using the prebuilt image
     # build:
     #   context: ./app
