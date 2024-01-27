@@ -36,7 +36,7 @@ export class FriendsRabbitService {
       event.data.relationship === SteamUser.EFriendRelationship.RequestRecipient
     ) {
       const url =
-        `http://bot-${event.metadata.steamid64}:3000/${FRIENDS_BASE_URL}/${FRIENDS_PATH}${FRIEND_PATH}`.replace(
+        `http://bot-${event.metadata.steamid64}:3000${FRIENDS_BASE_URL}${FRIEND_PATH}`.replace(
           ':steamid',
           event.data.steamid64,
         );
@@ -49,9 +49,23 @@ export class FriendsRabbitService {
         ),
       );
 
-      this.logger.log(`Added ${event.data.steamid64}? ${addFriendData.added}`);
+      if (!addFriendData.added) {
+        this.logger.error(
+          `Failed to accept friend request from ${event.data.steamid64}`,
+        );
+        return;
+      }
 
-      this.friendsService.sendMessage(
+      this.logger.log(`Added ${event.data.steamid64}`);
+    }
+
+    if (event.data.relationship === SteamUser.EFriendRelationship.None) {
+      this.logger.log(`Unfriended ${event.data.steamid64}`);
+    }
+
+    if (event.data.relationship === SteamUser.EFriendRelationship.Friend) {
+      this.logger.log(`Became friends with ${event.data.steamid64}`);
+      await this.friendsService.sendMessage(
         event.metadata.steamid64,
         event.data.steamid64,
         `Hello, friend!`,

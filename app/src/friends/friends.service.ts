@@ -15,7 +15,7 @@ export class FriendsService {
 
   public async sendMessage(fromBot: string, to: string, message: string) {
     const url =
-      `http://bot-${fromBot}:3000${FRIENDS_BASE_URL}/${FRIEND_MESSAGE_PATH}/`.replace(
+      `http://bot-${fromBot}:3000${FRIENDS_BASE_URL}${FRIEND_MESSAGE_PATH}/`.replace(
         ':steamid',
         to,
       );
