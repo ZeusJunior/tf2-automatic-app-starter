@@ -1,19 +1,28 @@
-import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  BOT_EXCHANGE_NAME,
-  TRADE_RECEIVED_EVENT,
-  TradeReceivedEvent,
-} from '@tf2-automatic/bot-data';
+  TRADE_JOBS_FULL_PATH,
+  QueueTradeCreate,
+} from '@tf2-automatic/bot-manager-data';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class TradesService {
+  constructor(private readonly httpService: HttpService) {}
+
   private readonly logger = new Logger(TradesService.name);
-  @RabbitSubscribe({
-    exchange: BOT_EXCHANGE_NAME,
-    routingKey: TRADE_RECEIVED_EVENT,
-  })
-  public async handleFriendRelationshipEvent(event: TradeReceivedEvent) {
-    this.logger.log(`New trade received: ${JSON.stringify(event, null, 2)}`);
+
+  public async acceptOffer(fromBot: string, id: string) {
+    const url = `http://bot-manager:3000${TRADE_JOBS_FULL_PATH}`;
+
+    await firstValueFrom(
+      this.httpService.post<QueueTradeCreate>(url, {
+        type: 'ACCEPT',
+        data: id,
+        bot: fromBot,
+      }),
+    );
+
+    this.logger.log(`Accepted trade ${id}`);
   }
 }
