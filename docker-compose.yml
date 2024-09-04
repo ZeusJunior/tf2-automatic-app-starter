@@ -9,8 +9,6 @@ x-base-bot: &base-bot
     - minio
   expose:
     - '3000'
-  volumes:
-    - 'bot:/data'
   environment: &rmq-redis-env	
     REDIS_HOST: 'redis'
     REDIS_PORT: 6379
@@ -22,7 +20,6 @@ x-base-bot: &base-bot
     RABBITMQ_VHOST: ''
 
 volumes:
-  bot:
   rabbitmq:
   redis:
   minio:
