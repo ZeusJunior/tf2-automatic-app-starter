@@ -1,18 +1,15 @@
 # syntax=docker/dockerfile:1
-FROM node:20-alpine as build
+FROM node:20-alpine AS build
 ENV NODE_ENV=build
 WORKDIR /app
 
 ARG NODE_AUTH_TOKEN
-COPY ./package.json ./yarn.lock ./
-COPY ./.npmrc.ci ./.npmrc
-COPY ./tsconfig.build.json ./tsconfig.json ./
-RUN yarn global add @nestjs/cli
-RUN yarn install --frozen-lockfile
 COPY . .
-RUN yarn build
+RUN yarn global add @nestjs/cli \
+    && yarn install --frozen-lockfile \
+    && yarn build
 
-FROM node:20-alpine as production
+FROM node:20-alpine AS production
 ENV NODE_ENV=production
 WORKDIR /app
 
